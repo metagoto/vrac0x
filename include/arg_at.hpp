@@ -70,7 +70,7 @@ struct type_at
 
 
 template<std::size_t Index, typename... T>
-constexpr auto arg_at(T&&... args) -> typename type_at<Index, T...>::type
+constexpr inline auto arg_at(T&&... args) -> typename type_at<Index, T...>::type
 {
     return arg_at_impl<Index, 0, T...>::apply(std::forward<T>(args)...);
 }
