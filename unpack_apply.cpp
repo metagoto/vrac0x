@@ -44,7 +44,7 @@ int main()
     unpack_apply(v, std::tuple<>());
 
     unpack_apply([](int a, float b, char c){
-            std::cout << a << b << c << std::endl;
+        std::cout << a << b << c << std::endl;
     }, std::make_tuple(2, 3.14f), 'z');
 
     unpack_apply(functor(), tup());
