@@ -39,6 +39,9 @@ namespace vrac0x { namespace js0n
             case type::bool_:
                 std::cout << (j.b_ ? "true" : "false") << std::endl;
                 break;
+            case type::null:
+                std::cout << "*null*" << std::endl;
+                break;
             case type::undefined:
                 std::cout << "*undefined*" << std::endl;
                 break;

@@ -4,6 +4,8 @@
 namespace vrac0x { namespace js0n
 {
 
+    struct null_type {};
+
     enum class type : unsigned int
     {
         undefined,
@@ -12,7 +14,8 @@ namespace vrac0x { namespace js0n
         string,
         int_,
         double_,
-        bool_
+        bool_,
+        null
     };
 
 

@@ -13,8 +13,9 @@ namespace vrac0x { namespace js0n
         val(int);
         val(double);
         val(bool);
+        val(null_type);
 
-        val(array const& ja);
+        val(array const&);
         val(std::initializer_list<pair>);
         val(std::initializer_list<val>);
 
@@ -49,7 +50,7 @@ namespace vrac0x { namespace js0n
 
 
     inline val::val()
-        : type_(type::undefined)
+        : type_(type::null)
     { }
 
 
@@ -80,6 +81,11 @@ namespace vrac0x { namespace js0n
     inline val::val(bool b)
         : type_(type::bool_)
         , b_(b)
+    { }
+
+
+    inline val::val(null_type)
+        : type_(type::null)
     { }
 
 
@@ -164,6 +170,8 @@ namespace vrac0x { namespace js0n
                 case type::bool_:
                     b_ = o.b_;
                     break;
+                default:
+                    break;
             }
             return;
         }
@@ -190,6 +198,8 @@ namespace vrac0x { namespace js0n
             case type::bool_:
                 b_ = o.b_;
                 break;
+            default:
+                break;
         }
 
     }
@@ -207,6 +217,8 @@ namespace vrac0x { namespace js0n
                 break;
             case type::string:
                 s_.~string();
+                break;
+            default:
                 break;
         }
 
@@ -238,6 +250,8 @@ namespace vrac0x { namespace js0n
                 case type::bool_:
                     b_ = o.b_;
                     break;
+                default:
+                    break;
             }
             return;
         }
@@ -263,6 +277,8 @@ namespace vrac0x { namespace js0n
                 break;
             case type::bool_:
                 b_ = o.b_;
+                break;
+            default:
                 break;
         }
     }

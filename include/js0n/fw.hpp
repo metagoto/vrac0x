@@ -21,6 +21,8 @@ namespace vrac0x { namespace js0n
     typedef std::vector<val> array;
 
 
+    struct null_type;
+
     enum class type : unsigned int;
 
 } }

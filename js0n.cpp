@@ -8,6 +8,9 @@ int main()
 {
     using vrac0x::js0n::val;
     using vrac0x::js0n::k;
+    using vrac0x::js0n::null_type;
+
+    null_type null;
 
     // when the compiler supports user defined literals
     // we should be able to "coolify" the object's keys notation
@@ -16,12 +19,12 @@ int main()
 
 
     val j = {
-        k("bool") = "true",
+        k("bool") = true,
         k("key") = "val",
         k("other") = "da value",
         k("intkey") = 42,
         k("suboject") = {
-            k("key2") = "val2",
+            k("key2") = null,
             k("arrkey") = {
                 1,
                 2,
@@ -34,12 +37,12 @@ int main()
         k("pi") = 3.14
 
         ,k("MORE") = {
-            k("bool") = "true",
+            k("bool") = true,
             k("key") = "val",
             k("other") = "da value",
             k("intkey") = 42,
             k("suboject") = {
-                k("key2") = "val2",
+                k("key2") = null,
                 k("arrkey") = {
                     1,
                     2,
@@ -63,9 +66,18 @@ int main()
 
     val j4;
 
+    val j5 = null;
+
+    val j6 = {1,2,null};
+
+    val j7 = {"test", j6, true};
+
     print(j);
     print(j2);
     print(j3);
     print(j4);
+    print(j5);
+    print(j6);
+    print(j7);
 
 }
