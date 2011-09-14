@@ -4,6 +4,10 @@
 #include "testiculs/basis.hpp"
 
 
+#define STATIC_ASSERT(a) static_assert(a, #a);
+#define STATIC_ASSERT_NOT(a) static_assert(!(a), #a);
+
+
 #define _T_INFO(t) #t, __FILE__, __LINE__
 #define _T_INFO1(t,a) std::forward_as_tuple(a), std::forward_as_tuple(#a), _T_INFO(t)
 #define _T_INFO2(t,a,b) std::forward_as_tuple(a, b), std::forward_as_tuple(#a, #b), _T_INFO(t)
