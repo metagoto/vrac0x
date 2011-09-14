@@ -11,7 +11,7 @@ namespace vrac0x { namespace testiculs
 
 
     template<typename... T, typename... E>
-    static void report(bool success, std::tuple<T...> const& args
+    inline void report(bool success, std::tuple<T...> const& args
                       ,std::tuple<E...> const& exps
                       ,char const* test, char const* file, std::size_t line)
     {
@@ -25,32 +25,24 @@ namespace vrac0x { namespace testiculs
 
 
     template<typename F, typename... T, typename... E>
-    static void check(F const& f, std::tuple<T...> const& args
+    inline bool check(F const& f, std::tuple<T...> const& args
                      ,std::tuple<E...> const& exps
                      ,char const* test, char const* file, std::size_t line)
     {
-        if (unpack_apply(f, args))
-            report(true, args, exps, test, file, line);
-        else
-            report(false, args, exps, test, file, line);
-
+        bool success = unpack_apply(f, args);
+        report(success, args, exps, test, file, line);
+        return success;
     }
 
 
-    template<typename F, typename... T, typename... E>
-    static void assert(F const& f, std::tuple<T...> const& args
-                      ,std::tuple<E...> const& exps
-                      ,char const* test, char const* file, std::size_t line)
+    inline void assert_(bool b)
     {
-        if (unpack_apply(f, args))
-            report(true, args, exps, test, file, line);
-        else {
-            report(false, args, exps, test, file, line);
+        if (!b)
+        {
             std::cout << "exiting" << std::endl;
             exit(1);
         }
     }
-
 
 
 
