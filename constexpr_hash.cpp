@@ -1,6 +1,6 @@
-#include <iostream>
 
 #include "include/fnv1a.hpp"
+#include "include/testiculs.hpp"
 
 
 // runtime hash
@@ -12,7 +12,6 @@ uint64_t fnv1a_64(char const* s)
         h = (h ^ *s) * p;
     return h;
 }
-
 
 
 template<uint64_t H>
@@ -42,26 +41,37 @@ namespace dum
 }
 
 
-
-#define TEST1(str) std::cout << str << " " << fnv1a_64(str) << " " \
-    << (fnv1a_64(str) == check<h64(str)>::value) << std::endl;
-
-#define TEST2(t, v) std::cout << (dum::a<t>::value == v) << std::endl;
-
-
 int main()
 {
 
     using vrac0x::fnv1a::h64;
 
-    TEST1("hello world")
-    TEST1("salut")
-    TEST1("saluv")
-    TEST1("")
+    CHECK(fnv1a_64("") == h64(""));
+    CHECK(fnv1a_64("hello world") == h64("hello world"));
 
+    constexpr auto a = h64("abcd");
+    CHECK_EQ(fnv1a_64("abcd"), a);
+    CHECK(fnv1a_64("abcd") == a);
 
-    TEST2(0,              false)
-    TEST2(h64("blah"),    false)
-    TEST2(h64("dispatch"),true)
+    constexpr auto b = check<h64("xyz")>::value;
+    CHECK_EQ(fnv1a_64("xyz"), b);
+
+    CHECK_EQ(fnv1a_64("blah"), static_cast<uint64_t>(check<h64("blah")>::value));
+
+    CHECK_NEQ(h64("salut"), h64("saluv"));
+
+    PRINT(fnv1a_64("hello world"));
+    PRINT(h64("hello world"));
+
+    PRINT(fnv1a_64(""));
+    PRINT(h64(""));
+
+    PRINT(fnv1a_64(" "));
+    PRINT(h64(" "));
+
+    STATIC_ASSERT(check<h64("hello world")>::value);
+    STATIC_ASSERT(dum::a<h64("dispatch")>::value);
+    STATIC_ASSERT_NOT(dum::a<h64("blah")>::value);
+    STATIC_ASSERT_NOT(dum::a<h64("")>::value);
 
 }
