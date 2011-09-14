@@ -102,3 +102,6 @@
 
 #define ASSERT_NO_THROW(c) \
     { bool caught = false; _CHECK_ANY_THROW(ASSERT_NO_THROW,c,!caught) _ASSERT(!caught); }
+
+
+#define PRINT(c) std::cout << #c << " : " << (c) << std::endl;
