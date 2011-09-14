@@ -63,3 +63,38 @@
 
 #define CHECK_STRNEQ(a,b) _CHECK_STRNEQ(CHECK_STRNEQ,a,b);
 #define ASSERT_STRNEQ(a,b) _ASSERT(_CHECK_STRNEQ(ASSERT_STRNEQ,a,b));
+
+
+#define _CHECK_THROW(t,c,e,r) \
+    { try { c; } \
+      catch (e const&) { caught = true; } \
+      catch (...) { } \
+      auto f = [=]{ return r; }; \
+      vrac0x::testiculs::check( \
+          f, std::make_tuple(), std::forward_as_tuple(#c, #e), _T_INFO(t)); \
+    }
+
+#define _CHECK_ANY_THROW(t,c,r) \
+    { try { c; } catch (...) { caught = true; } \
+      auto f = [=]{ return r; }; \
+      vrac0x::testiculs::check( \
+          f, std::make_tuple(), std::forward_as_tuple(#c), _T_INFO(t)); \
+    }
+
+#define CHECK_THROW(c,e) \
+    { bool caught = false; _CHECK_THROW(CHECK_THROW,c,e,caught) }
+
+#define CHECK_ANY_THROW(c) \
+    { bool caught = false; _CHECK_ANY_THROW(CHECK_ANY_THROW,c,caught) }
+
+#define CHECK_NO_THROW(c) \
+    { bool caught = false; _CHECK_ANY_THROW(CHECK_NO_THROW,c,!caught) }
+
+#define ASSERT_THROW(c,e) \
+    { bool caught = false; _CHECK_THROW(ASSERT_THROW,c,e,caught) _ASSERT(caught); }
+
+#define ASSERT_ANY_THROW(c) \
+    { bool caught = false; _CHECK_ANY_THROW(ASSERT_ANY_THROW,c,caught) _ASSERT(caught); }
+
+#define ASSERT_NO_THROW(c) \
+    { bool caught = false; _CHECK_ANY_THROW(ASSERT_NO_THROW,c,!caught) _ASSERT(!caught); }
