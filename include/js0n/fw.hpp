@@ -29,9 +29,6 @@ namespace vrac0x { namespace js0n
     enum class type_info : unsigned int;
 
 
-    struct iterator;
-
-
     template<typename U>
     U& get(val&);
 
@@ -63,8 +60,14 @@ namespace vrac0x { namespace js0n
 
     namespace detail
     {
-        template<typename T>
+        template<typename>
         struct type_to_mem;
+
+        template<typename>
+        struct iter;
     }
+
+    typedef detail::iter<val> iterator;
+    typedef detail::iter<val const> const_iterator;
 
 } }

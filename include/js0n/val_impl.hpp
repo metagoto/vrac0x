@@ -116,7 +116,7 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline val& val::operator[](unsigned int i)
+    inline val& val::operator[](size_t i)
     {
         if (type() != type_info::array)
             throw std::invalid_argument("not an array");
@@ -130,7 +130,7 @@ namespace vrac0x { namespace js0n
         if (type() != type_info::object)
             throw std::invalid_argument("not an object");
 
-        auto it = std::find_if(o_.begin(), o_.end(), [s](pair const& p){
+        auto it = std::find_if(o_.begin(), o_.end(), [&s](pair const& p){
             return p.first == s;
         });
 
@@ -146,7 +146,26 @@ namespace vrac0x { namespace js0n
     template<size_t N>
     inline val& val::operator[](char const(&s)[N])
     {
-       return this->operator[](string(s));
+        return this->operator[](string(s));
+    }
+
+
+    inline val const& val::operator[](size_t i) const
+    {
+        return const_cast<val const&>(const_cast<val*>(this)->operator[](i));
+    }
+
+
+    inline val const& val::operator[](string const& s) const
+    {
+        return const_cast<val const&>(const_cast<val*>(this)->operator[](s));
+    }
+
+
+    template<size_t N>
+    inline val const& val::operator[](char const(&s)[N]) const
+    {
+        return const_cast<val const&>(const_cast<val*>(this)->operator[](string(s)));
     }
 
 
@@ -187,7 +206,7 @@ namespace vrac0x { namespace js0n
             default:
                 break;
         }
-        return false;
+        return true;
     }
 
 

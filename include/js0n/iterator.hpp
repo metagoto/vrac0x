@@ -6,14 +6,14 @@
 namespace vrac0x { namespace js0n
 {
 
-    inline namespace detail
+    namespace detail
     {
 
 
         struct iter_impl_base
         {
             virtual ~iter_impl_base() {}
-            virtual bool operator!=(iter_impl_base const& rhs) const = 0;
+            virtual bool operator!=(iter_impl_base const&) const = 0;
             virtual iter_impl_base& operator++() = 0;
             virtual iter_impl_base& operator+(std::size_t i) = 0;
             virtual val const& operator*() const = 0;
@@ -25,14 +25,17 @@ namespace vrac0x { namespace js0n
         struct iter_impl : public iter_impl_base
         {
 
-            typedef iter_impl<T> self_type;
             typedef T container_type;
-            typedef typename T::const_iterator it_type;
+            typedef iter_impl<T> self_type;
+            typedef typename std::conditional<
+                std::is_const<T>::value, typename T::const_iterator, typename T::iterator
+            >::type it_type;
+
 
             virtual ~iter_impl() {}
 
 
-            iter_impl(container_type const& c, bool end = false)
+            iter_impl(container_type& c, bool end = false)
                 : it(end ? c.end() : c.begin())
             { }
 
@@ -59,13 +62,14 @@ namespace vrac0x { namespace js0n
 
             val const& operator*() const
             {
-                return deref(std::is_same<T, object>());
+                return deref(std::is_same<typename std::remove_const<T>::type, object>());
             }
 
 
             val& operator*()
             {
-                return const_cast<val&>(deref(std::is_same<T, object>()));
+                return const_cast<val&>(
+                    deref(std::is_same<typename std::remove_const<T>::type, object>()));
             }
 
 
@@ -84,74 +88,78 @@ namespace vrac0x { namespace js0n
             it_type it;
         };
 
-    }
 
 
-
-    struct iterator
-    {
-
-        iterator(val const& v, bool end = false)
-            : it_impl(v.type() == type_info::object
-                      ? static_cast<iter_impl_base*>(new iter_impl<object>(v.o_, end))
-                      : static_cast<iter_impl_base*>(new iter_impl<array>(v.a_, end)))
-        { }
-
-
-        iterator(val& v, bool end = false)
-            : it_impl(v.type() == type_info::object
-                      ? static_cast<iter_impl_base*>(new iter_impl<object>(v.o_, end))
-                      : static_cast<iter_impl_base*>(new iter_impl<array>(v.a_, end)))
-        { }
-
-
-        bool operator!=(iterator const& rhs) const
+        template<typename T>
+        struct iter
         {
-            return it_impl->operator!=(*(rhs.it_impl));
-        }
+
+            typedef T  value;
+            typedef T& reference;
+            typedef iter<T> self_type;
+
+            template<typename U>
+            struct c_qual
+            {
+                typedef typename std::conditional<
+                    std::is_const<T>::value, U const, U
+                >::type type;
+            };
 
 
-        iterator& operator++()
-        {
-            it_impl->operator++();
-            return *this;
-        }
+            iter(value& v, bool end = false)
+                : v(v)
+                , end(end)
+                , it_impl(v.type() == type_info::object
+                    ? static_cast<iter_impl_base*>(new iter_impl<typename c_qual<object>::type>(v.o_, end))
+                    : static_cast<iter_impl_base*>(new iter_impl<typename c_qual<array>::type>(v.a_, end)))
+            { }
 
 
-        iterator& operator+(std::size_t i)
-        {
-            it_impl->operator+(i);
-            return *this;
-        }
+            bool operator==(self_type const& rhs) const
+            {
+                return !it_impl->operator!=(*(rhs.it_impl));
+            }
 
 
-        val const& operator*() const
-        {
-            return it_impl->operator*();
-        }
+            bool operator!=(self_type const& rhs) const
+            {
+                return it_impl->operator!=(*(rhs.it_impl));
+            }
 
 
-        val& operator*()
-        {
-            return it_impl->operator*();
-        }
+            self_type& operator++()
+            {
+                it_impl->operator++();
+                return *this;
+            }
 
 
-        std::shared_ptr<iter_impl_base> it_impl;
-    };
+            self_type& operator+(std::size_t i)
+            {
+                it_impl->operator+(i);
+                return *this;
+            }
 
 
-    // TODO const_iterator
-
-    iterator begin(val const& v)
-    {
-        return iterator(v);
-    }
+            reference operator*() const
+            {
+                return it_impl->operator*();
+            }
 
 
-    iterator end(val const& v)
-    {
-        return iterator(v, true);
+            operator iter<typename std::add_const<T>::type> ()
+            {
+                return iter<value const>(v, end);
+            }
+
+
+            value& v;
+            bool end;
+            std::shared_ptr<iter_impl_base> it_impl;
+        };
+
+
     }
 
 
@@ -164,6 +172,18 @@ namespace vrac0x { namespace js0n
     iterator end(val& v)
     {
        return iterator(v, true);
+    }
+
+
+    const_iterator begin(val const& v)
+    {
+        return const_iterator(v);
+    }
+
+
+    const_iterator end(val const& v)
+    {
+        return const_iterator(v, true);
     }
 
 

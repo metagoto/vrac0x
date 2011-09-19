@@ -33,10 +33,15 @@ namespace vrac0x { namespace js0n
 
         ~val();
 
-        val& operator[](unsigned int);
+        val& operator[](size_t);
         val& operator[](string const&);
         template<size_t N>
         val& operator[](char const(&)[N]);
+
+        val const& operator[](size_t) const;
+        val const& operator[](string const&) const;
+        template<size_t N>
+        val const& operator[](char const(&)[N]) const;
 
         // not sure we need this
         template<typename T>
@@ -66,9 +71,10 @@ namespace vrac0x { namespace js0n
         void move(val&&);
         void free();
 
-        friend struct iterator;
+        template<typename>
+        friend struct detail::iter;
 
-        template<typename T>
+        template<typename>
         friend struct detail::type_to_mem;
 
 
