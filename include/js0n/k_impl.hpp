@@ -24,5 +24,11 @@ namespace vrac0x { namespace js0n
     }
 
 
+    template<typename T>
+    inline pair k::operator=(std::initializer_list<T> list)
+    {
+        return pair(key, list);
+    }
+
 
 } }
