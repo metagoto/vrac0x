@@ -1,26 +1,17 @@
 #pragma once
 
-#include <string>
-//#include <vector>
-#include <deque>
+#include <string> ///
+#include <vector> ///
+#include <deque> ///
 
 namespace vrac0x { namespace js0n
 {
 
-    struct k;
+    template<typename, typename>
+    struct traits;
 
-    struct val;
-
-
-    typedef std::string string;
-
-    typedef std::pair<string, val> pair;
-
-//TODO make it parameterizable
-//    typedef std::vector<pair> object;
-//    typedef std::vector<val> array;
-    typedef std::deque<pair> object;
-    typedef std::deque<val> array;
+    template<typename, typename>
+    struct basic_val;
 
     struct null_type;
     struct empty_array_type;
@@ -29,45 +20,45 @@ namespace vrac0x { namespace js0n
     enum class type_info : unsigned int;
 
 
-    template<typename U>
-    U& get(val&);
+    template<typename U, typename S, typename C>
+    U& get(basic_val<S,C>&);
 
-    template<typename U>
-    U const& get(val const&);
+    template<typename U, typename S, typename C>
+    U const& get(basic_val<S,C> const&);
 
-    template<typename U>
-    U* get(val*);
+    template<typename U, typename S, typename C>
+    U* get(basic_val<S,C>*);
 
-    template<typename U>
-    U const* get(val const*);
+    template<typename U, typename S, typename C>
+    U const* get(basic_val<S,C> const*);
 
 
-    template<typename U>
-    bool operator==(val const&, U const&);
+    template<typename U, typename S, typename C>
+    bool operator==(basic_val<S,C> const&, U const&);
 
-    template<typename U>
-    bool operator==(U const&, val const&);
+    template<typename U, typename S, typename C>
+    bool operator==(U const&, basic_val<S,C> const&);
 
-    bool operator==(val const&, null_type);
-    bool operator==(null_type, val const&);
+    template<typename S, typename C>
+    bool operator==(basic_val<S,C> const&, null_type);
 
-    template<typename U>
-    bool operator!=(val const&, U const&);
+    template<typename S, typename C>
+    bool operator==(null_type, basic_val<S,C> const&);
 
-    template<typename U>
-    bool operator!=(U const&, val const&);
+    template<typename U, typename S, typename C>
+    bool operator!=(basic_val<S,C> const&, U const&);
+
+    template<typename U, typename S, typename C>
+    bool operator!=(U const&, basic_val<S,C> const&);
 
 
     namespace detail
     {
-        template<typename>
+        template<typename,typename>
         struct type_to_mem;
 
         template<typename>
         struct iter;
     }
-
-    typedef detail::iter<val> iterator;
-    typedef detail::iter<val const> const_iterator;
 
 } }

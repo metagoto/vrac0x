@@ -2,16 +2,13 @@
 
 #include "include/js0n.hpp"
 #include "include/js0n/print.hpp"
-
 #include "include/testiculs.hpp"
 
 
 int main()
 {
-    using vrac0x::js0n::val;
-    using vrac0x::js0n::k;
-    using vrac0x::js0n::null;
-
+    using namespace vrac0x::js0n;
+    typedef val::k k;
 
     // when the compiler supports user defined literals
     // we should be able to "coolify" the object's keys notation
@@ -38,7 +35,7 @@ int main()
     }
 
     {
-        using vrac0x::js0n::string; // std::string btw
+        typedef val::string string;
 
         val j = 3;
         CHECK_EQ(j, 3);
@@ -97,9 +94,6 @@ int main()
     }
 
     {
-        using vrac0x::js0n::empty_array;
-        using vrac0x::js0n::empty_object;
-
         val j = empty_object;
 
         j["key"] = 1;
@@ -129,10 +123,8 @@ int main()
 
 
     {
-        using vrac0x::js0n::begin;
-        using vrac0x::js0n::end;
-        using vrac0x::js0n::iterator;
-        using vrac0x::js0n::const_iterator;
+        typedef val::iterator iterator;
+        typedef val::const_iterator const_iterator;
 
         val jo = {k("x")=1, k("y")=true, k("z")=null};
         val ja = {1, true, null};
@@ -192,11 +184,10 @@ int main()
     }
 
     {
-        using vrac0x::js0n::get;
-        using vrac0x::js0n::string;
-        using vrac0x::js0n::object;
-        using vrac0x::js0n::array;
-        using vrac0x::js0n::pair;
+        typedef val::string string;
+        typedef val::object object;
+        typedef val::array array;
+        typedef val::pair pair;
 
         val j = json;
         val& jj = j;
@@ -211,8 +202,8 @@ int main()
         CHECK_STREQ(jj["other"], "new");
         CHECK_EQ(get<string>(jj["other"]), "new");
 
-        bool const& b = get<bool>(val{k("woot")=true}["woot"]);
-        CHECK_EQ(b, true);
+//        bool const& b = get<bool>(val{k("woot")=true}["woot"]);
+//        CHECK_EQ(b, true);
 
         CHECK_ANY_THROW(get<string>(jj["int"]));
 
@@ -241,5 +232,53 @@ int main()
         }
 
     }
+
+    {
+        typedef basic_val<tag::u32string, tag::deque> val32;
+        typedef val32::k k;
+
+        val32 json = {
+            k(U"bool")  = true,
+            k(U"key")   = U"val",
+            k(U"other") = U"da value",
+            k(U"int")   = 42,
+            k(U"obj")   = {
+                k(U"key2") = null,
+                k(U"arr")  = {1, 2, U"STR", {3, 1.4142}, {k(U"dd") = 66}, false}
+            },
+            k(U"pi")    = 3.14
+        };
+
+    }
+
+
+//    {
+//        struct test
+//        {
+//            val fa()
+//            {
+//                return { k("job") = "test", k("args") = {1, "ok", true} };
+//            }
+
+//            void fb(val const& v)
+//            {
+//                PRINT(v);
+//            }
+//        };
+
+//        test t;
+//        val j = t.fa();
+//        PRINT(j);
+
+//        t.fb(j);
+//        t.fb({1,2,3,null});
+
+//        PRINT(j.size()); // obj
+//        PRINT(j["args"].size()); // arr
+//        PRINT(j["args"][1].size()); // str
+//        PRINT(j["args"][2].size()); // other
+
+//        //PRINT(typeid(int));
+//    }
 
 }

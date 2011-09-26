@@ -8,8 +8,8 @@ namespace vrac0x { namespace js0n
     namespace detail
     {
 
-        template<>
-        struct type_to_mem<int>
+        template<typename V>
+        struct type_to_mem<V, int>
         {
             template<typename T>
             static typename std::conditional<
@@ -24,8 +24,8 @@ namespace vrac0x { namespace js0n
         };
 
 
-        template<>
-        struct type_to_mem<double>
+        template<typename V>
+        struct type_to_mem<V, double>
         {
             template<typename T>
             static typename std::conditional<
@@ -40,8 +40,8 @@ namespace vrac0x { namespace js0n
         };
 
 
-        template<>
-        struct type_to_mem<bool>
+        template<typename V>
+        struct type_to_mem<V, bool>
         {
             template<typename T>
             static typename std::conditional<
@@ -56,8 +56,8 @@ namespace vrac0x { namespace js0n
         };
 
 
-        template<>
-        struct type_to_mem<std::string>
+        template<typename V>
+        struct type_to_mem<V, typename V::string>
         {
             template<typename T>
             static typename std::conditional<
@@ -72,9 +72,11 @@ namespace vrac0x { namespace js0n
         };
 
 
-        template<>
-        struct type_to_mem<object>
+        template<typename V>
+        struct type_to_mem<V, typename V::object>
         {
+            typedef typename V::object object;
+
             template<typename T>
             static typename std::conditional<
                 std::is_const<T>::value, object const*, object*
@@ -88,9 +90,11 @@ namespace vrac0x { namespace js0n
         };
 
 
-        template<>
-        struct type_to_mem<array>
+        template<typename V>
+        struct type_to_mem<V, typename V::array>
         {
+            typedef typename V::array array;
+
             template<typename T>
             static typename std::conditional<
                 std::is_const<T>::value, array const*, array*
@@ -105,15 +109,15 @@ namespace vrac0x { namespace js0n
 
 
         // TODO wtf specialization
-        template<>
-        struct type_to_mem<char const>
+        template<typename V>
+        struct type_to_mem<V, typename V::char_type const>
         {
             template<typename T>
-            static char const*
+            static typename V::char_type const*
             get(T& v)
             {
                 if (v.type() == type_info::string)
-                    return const_cast<val const&>(v).s_.c_str();
+                    return const_cast<V const&>(v).s_.c_str();
                 return nullptr;
             }
         };
@@ -122,78 +126,80 @@ namespace vrac0x { namespace js0n
 
 
 
-    template<typename U>
-    inline U& get(val& v)
+    template<typename U, typename S, typename C>
+    inline U& get(basic_val<S,C>& v)
     {
-        U* u = detail::type_to_mem<U>::get(v);
+        U* u = detail::type_to_mem<basic_val<S,C>,U>::get(v);
         if (u)
             return *u;
         throw std::invalid_argument("bad type request");
     }
 
 
-    template<typename U>
-    inline U const& get(val const& v)
+    template<typename U, typename S, typename C>
+    inline U const& get(basic_val<S,C> const& v)
     {
-        U const* u = detail::type_to_mem<U>::get(v);
+        U const* u = detail::type_to_mem<basic_val<S,C>,U>::get(v);
         if (u)
             return *u;
         throw std::invalid_argument("bad type request");
     }
 
 
-    template<typename U>
-    inline U* get(val* v)
+    template<typename U, typename S, typename C>
+    inline U* get(basic_val<S,C>* v)
     {
-        return v ? detail::type_to_mem<U>::get(*v) : nullptr;
+        return v ? detail::type_to_mem<basic_val<S,C>,U>::get(*v) : nullptr;
     }
 
 
-    template<typename U>
-    inline U const* get(val const* v)
+    template<typename U, typename S, typename C>
+    inline U const* get(basic_val<S,C> const* v)
     {
-        return v ? detail::type_to_mem<U>::get(*v) : nullptr;
+        return v ? detail::type_to_mem<basic_val<S,C>,U>::get(*v) : nullptr;
     }
 
 
-    template<typename U>
-    inline bool operator==(val const& v, U const& u)
+    template<typename U, typename S, typename C>
+    inline bool operator==(basic_val<S,C> const& v, U const& u)
     {
-        U const* t = detail::type_to_mem<U>::get(v);
+        U const* t = detail::type_to_mem<basic_val<S,C>,U>::get(v);
         if (t)
             return *t == u;
         return false;
     }
 
 
-    template<typename U>
-    inline bool operator==(U const& u, val const& v)
+    template<typename U, typename S, typename C>
+    inline bool operator==(U const& u, basic_val<S,C> const& v)
     {
         return v == u;
     }
 
 
-    inline bool operator==(val const& v, null_type)
+    template<typename S, typename C>
+    inline bool operator==(basic_val<S,C> const& v, null_type)
     {
         return v.type() == type_info::null;
     }
 
 
-    inline bool operator==(null_type, val const& v)
+    template<typename S, typename C>
+    inline bool operator==(null_type, basic_val<S,C> const& v)
     {
         return v.type() == type_info::null;
     }
 
 
-    template<typename U>
-    inline bool operator!=(val const& v, U const& u)
+    template<typename U, typename S, typename C>
+    inline bool operator!=(basic_val<S,C> const& v, U const& u)
     {
         return !(v == u);
     }
 
 
-    template<typename U>
-    inline bool operator!=(U const& u, val const& v)
+    template<typename U, typename S, typename C>
+    inline bool operator!=(U const& u, basic_val<S,C> const& v)
     {
         return !(v == u);
     }

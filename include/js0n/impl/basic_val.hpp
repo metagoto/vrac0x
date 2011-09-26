@@ -7,65 +7,107 @@
 namespace vrac0x { namespace js0n
 {
 
-    inline val::val()
+    template<typename S, typename C>
+    inline basic_val<S,C>::k::k(char_type const* s)
+        : key(s)
+    { }
+
+
+    template<typename S, typename C>
+    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(array const& a)
+    {
+        return pair(key, a);
+    }
+
+
+    template<typename S, typename C>
+    template<typename T>
+    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(T&& t)
+    {
+        return pair(key, std::forward<T>(t));
+    }
+
+
+    template<typename S, typename C>
+    template<typename T>
+    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(std::initializer_list<T> list)
+    {
+        return pair(key, list);
+    }
+
+
+    /////////////
+
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val()
         : type_(type_info::null)
     { }
 
 
-    inline val::val(char const* s)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(basic_val<S,C>::char_type const* s)
         : type_(type_info::string)
         , s_(s)
     { }
 
 
-    inline val::val(string const& s)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(string const& s)
         : type_(type_info::string)
         , s_(s)
     { }
 
 
-    inline val::val(int i)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(int i)
         : type_(type_info::int_)
         , i_(i)
     { }
 
 
-    inline val::val(double d)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(double d)
         : type_(type_info::double_)
         , d_(d)
     { }
 
 
-    inline val::val(bool b)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(bool b)
         : type_(type_info::bool_)
         , b_(b)
     { }
 
 
-    inline val::val(null_type)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(null_type)
         : type_(type_info::null)
     { }
 
 
-    inline val::val(empty_array_type)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(empty_array_type)
         : type_(type_info::array)
         , a_()
     { }
 
 
-    inline val::val(empty_object_type)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(empty_object_type)
         : type_(type_info::object)
         , o_()
     { }
 
 
-    inline val::val(array const& a)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(array const& a)
         : type_(type_info::array)
         , a_(a)
     { }
 
 
-    inline val::val(std::initializer_list<pair> list)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(std::initializer_list<pair> list)
         : type_(type_info::object)
         , o_(list.size())
     {
@@ -73,7 +115,8 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline val::val(std::initializer_list<val> list)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(std::initializer_list<self_type> list)
         : type_(type_info::array)
         , a_(list.size())
     {
@@ -81,14 +124,16 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline val::val(val const& o)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(self_type const& o)
         : type_(type_info::undefined)
     {
         copy(o);
     }
 
 
-    inline val& val::operator=(val const& o)
+    template<typename S, typename C>
+    inline basic_val<S,C>& basic_val<S,C>::operator=(self_type const& o)
     {
         if (this != &o)
             copy(o);
@@ -96,27 +141,31 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline val::val(val&& o)
+    template<typename S, typename C>
+    inline basic_val<S,C>::basic_val(self_type&& o)
         : type_(type_info::undefined)
     {
         move(std::move(o));
     }
 
 
-    inline val& val::operator=(val&& o)
+    template<typename S, typename C>
+    inline basic_val<S,C>& basic_val<S,C>::operator=(self_type&& o)
     {
         move(std::move(o));
         return *this;
     }
 
 
-    inline val::~val()
+    template<typename S, typename C>
+    inline basic_val<S,C>::~basic_val()
     {
         free();
     }
 
 
-    inline val& val::operator[](size_t i)
+    template<typename S, typename C>
+    inline basic_val<S,C>& basic_val<S,C>::operator[](std::size_t i)
     {
         if (type() != type_info::array)
             throw std::invalid_argument("not an array");
@@ -125,7 +174,8 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline val& val::operator[](string const& s)
+    template<typename S, typename C>
+    inline basic_val<S,C>& basic_val<S,C>::operator[](string const& s)
     {
         if (type() != type_info::object)
             throw std::invalid_argument("not an object");
@@ -143,48 +193,53 @@ namespace vrac0x { namespace js0n
     }
 
 
-    template<size_t N>
-    inline val& val::operator[](char const(&s)[N])
+    template<typename S, typename C>
+    template<std::size_t N>
+    inline basic_val<S,C>& basic_val<S,C>::operator[](char_type const(&s)[N])
     {
         return this->operator[](string(s));
     }
 
 
-    inline val const& val::operator[](size_t i) const
+    template<typename S, typename C>
+    inline basic_val<S,C> const& basic_val<S,C>::operator[](std::size_t i) const
     {
-        return const_cast<val const&>(const_cast<val*>(this)->operator[](i));
+        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](i));
     }
 
 
-    inline val const& val::operator[](string const& s) const
+    template<typename S, typename C>
+    inline basic_val<S,C> const& basic_val<S,C>::operator[](string const& s) const
     {
-        return const_cast<val const&>(const_cast<val*>(this)->operator[](s));
+        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](s));
     }
 
 
-    template<size_t N>
-    inline val const& val::operator[](char const(&s)[N]) const
+    template<typename S, typename C>
+    template<std::size_t N>
+    inline basic_val<S,C> const& basic_val<S,C>::operator[](char_type const(&s)[N]) const
     {
-        return const_cast<val const&>(const_cast<val*>(this)->operator[](string(s)));
+        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](string(s)));
     }
 
 
+    template<typename S, typename C>
     template<typename T>
-    inline val::operator T() const
+    inline basic_val<S,C>::operator T() const
     {
         return *get<T>(this);
     }
 
 
-    //TODO wtf specialization
-    template<>
-    inline val::operator char const*() const
+    template<typename S, typename C>
+    inline basic_val<S,C>::operator char_type const*() const
     {
-        return get<char const>(this);
+        return get<char_type const>(this);
     }
 
 
-    inline bool val::operator==(val const& v) const
+    template<typename S, typename C>
+    inline bool basic_val<S,C>::operator==(self_type const& v) const
     {
         if (type() != v.type())
             return false;
@@ -210,19 +265,36 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline bool val::operator!=(val const& v) const
+    template<typename S, typename C>
+    inline bool basic_val<S,C>::operator!=(self_type const& v) const
     {
         return !this->operator==(v);
     }
 
 
-    inline type_info val::type() const
+    // TODO redo/refactor/rethink
+    template<typename S, typename C>
+    inline std::size_t basic_val<S,C>::size() const
+    {
+        if (type() == type_info::object)
+            return o_.size();
+        if (type() == type_info::array)
+            return a_.size();
+        if (type() == type_info::string)
+            return s_.size();
+        return 0;
+    }
+
+
+    template<typename S, typename C>
+    inline type_info basic_val<S,C>::type() const
     {
         return type_;
     }
 
 
-    inline void val::copy(val const& o)
+    template<typename S, typename C>
+    inline void basic_val<S,C>::copy(self_type const& o)
     {
         if (type() == o.type())
         {
@@ -280,7 +352,8 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline void val::free()
+    template<typename S, typename C>
+    inline void basic_val<S,C>::free()
     {
         switch (type())
         {
@@ -301,7 +374,8 @@ namespace vrac0x { namespace js0n
     }
 
 
-    inline void val::move(val&& o)
+    template<typename S, typename C>
+    inline void basic_val<S,C>::move(self_type&& o)
     {
         if (type() == o.type())
         {
@@ -357,9 +431,6 @@ namespace vrac0x { namespace js0n
                 break;
         }
     }
-
-
-
 
 
 } }
