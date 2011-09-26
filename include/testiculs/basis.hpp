@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../unpack.hpp"
+#include "../apply.hpp"
 #include "../tupility.hpp"
 
 
@@ -29,7 +29,7 @@ namespace vrac0x { namespace testiculs
                      ,std::tuple<E...> const& exps
                      ,char const* test, char const* file, std::size_t line)
     {
-        bool success = unpack_apply(f, args);
+        bool success = apply(f, args);
         report(success, args, exps, test, file, line);
         return success;
     }
@@ -39,7 +39,7 @@ namespace vrac0x { namespace testiculs
     {
         if (!b)
         {
-            std::cout << "exiting" << std::endl;
+            std::cout << "assertion failure. exiting" << std::endl;
             exit(1);
         }
     }

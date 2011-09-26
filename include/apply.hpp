@@ -34,7 +34,7 @@ namespace vrac0x
 
     template<typename F, typename... T, typename... A>
     typename std::result_of<F(T..., A...)>::type
-    constexpr inline unpack_apply(F&& f, std::tuple<T...> const& tup, A&&... args)
+    constexpr inline apply(F&& f, std::tuple<T...> const& tup, A&&... args)
     {
         return unpack<typename std::result_of<F(T..., A...)>::type, sizeof...(T)>
                 ::apply(std::forward<F>(f), tup, std::forward<A>(args)...);

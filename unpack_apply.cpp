@@ -1,7 +1,7 @@
 
 #include <iostream>
 
-#include "include/unpack.hpp"
+#include "include/apply.hpp"
 
 
 int f(char c)
@@ -35,23 +35,23 @@ std::tuple<std::string, int> tup()
 
 int main()
 {
-    using namespace vrac0x;
+    using vrac0x::apply;
 
-    unpack_apply(f, std::make_tuple('c'));
+    apply(f, std::make_tuple('c'));
 
-    unpack_apply(functor(), std::make_tuple(std::string{"hello"}, 42));
+    apply(functor(), std::make_tuple(std::string{"hello"}, 42));
 
-    unpack_apply(v, std::tuple<>());
+    apply(v, std::tuple<>());
 
-    unpack_apply([](int a, float b, char c){
+    apply([](int a, float b, char c){
         std::cout << a << b << c << std::endl;
     }, std::make_tuple(2, 3.14f), 'z');
 
-    unpack_apply(functor(), tup());
+    apply(functor(), tup());
 
     std::size_t i{3};
     std::tuple<std::string, std::size_t> t{"lut", i};
-    unpack_apply(functor(), t);
+    apply(functor(), t);
 
 
 }
