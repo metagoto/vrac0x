@@ -1,18 +1,25 @@
 #pragma once
 
+//#include <codecvt>
+
 
 namespace vrac0x { namespace js0n
 {
 
     // temp
-    inline void print(val const& j)
+    template<typename S, typename C>
+    inline void print(basic_val<S,C> const& v)
     {
+        typedef typename basic_val<S,C>::string string;
+        typedef typename basic_val<S,C>::pair   pair;
+        typedef typename basic_val<S,C>::object object;
+        typedef typename basic_val<S,C>::array  array;
 
-        switch (j.type())
+        switch (v.type())
         {
             case type_info::object:
                 std::cout << "{\n";
-                for (pair const& p : get<object>(j)) {
+                for (pair const& p : get<object>(v)) {
                     std::cout << p.first << ": ";
                     print(p.second);
                     std::cout << ",\n";
@@ -21,23 +28,23 @@ namespace vrac0x { namespace js0n
                 break;
             case type_info::array:
                 std::cout << "[ ";
-                for (val const& v : get<array>(j)) {
-                    print(v);
+                for (basic_val<S,C> const& w : get<array>(v)) {
+                    print(w);
                     std::cout << ", ";
                 }
                 std::cout << "]";
                 break;
             case type_info::string:
-                std::cout << get<string>(j);
+                std::cout << get<string>(v);
                 break;
             case type_info::int_:
-                std::cout << (int)j;
+                std::cout << get<int>(v); //(int)j;
                 break;
             case type_info::double_:
-                std::cout << (double)j;
+                std::cout << get<double>(v); //(double)j;
                 break;
             case type_info::bool_:
-                std::cout << ((bool)j ? "*true*" : "*false*");
+                std::cout << (get<bool>(v) ? "*true*" : "*false*");
                 break;
             case type_info::null:
                 std::cout << "*null*";
@@ -55,8 +62,10 @@ namespace vrac0x { namespace js0n
 } }
 
 
-std::ostream& operator<<(std::ostream& o, vrac0x::js0n::val const& v)
+template<typename S, typename C>
+std::ostream& operator<<(std::ostream& o, vrac0x::js0n::basic_val<S,C> const& v)
 {
-    print(v);
+    vrac0x::js0n::print(v);
     return o;
 }
+
