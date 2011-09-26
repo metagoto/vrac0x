@@ -9,28 +9,24 @@
 namespace vrac0x { namespace testiculs
 {
 
-
-    template<typename... T, typename... E>
-    inline void report(bool success, std::tuple<T...> const& args
-                      ,std::tuple<E...> const& exps
-                      ,char const* test, char const* file, std::size_t line)
+    inline namespace detail
     {
-        if (success)
-            std::cout << " PASS ";
-        else
-            std::cout << "-FAIL " << file << ":" << line << ": ";
-
-        std::cout << test << " " << exps << std::endl;
+        typedef std::tuple<char const*, char const*, std::size_t> info_pack;
     }
 
 
-    template<typename F, typename... T, typename... E>
-    inline bool check(F const& f, std::tuple<T...> const& args
-                     ,std::tuple<E...> const& exps
-                     ,char const* test, char const* file, std::size_t line)
+
+    template<typename... T, typename... E>
+    inline bool report(std::ostream& os, bool success
+                      ,std::tuple<E...> const& exps
+                      ,info_pack const& inf)
     {
-        bool success = apply(f, args);
-        report(success, args, exps, test, file, line);
+        if (success)
+            os << " PASS ";
+        else
+            os << "-FAIL " << std::get<1>(inf) << ":" << std::get<2>(inf) << ": ";
+
+        os << std::get<0>(inf) << " " << exps << std::endl;
         return success;
     }
 
@@ -43,6 +39,16 @@ namespace vrac0x { namespace testiculs
             exit(1);
         }
     }
+
+
+    template<typename F, typename... T, typename... E>
+    inline bool check(F const& f, std::tuple<T...> const& args
+                     ,std::tuple<E...> const& exps
+                     ,info_pack const& inf)
+    {
+        return report(std::cout, apply(f, args), exps, inf);
+    }
+
 
 
 

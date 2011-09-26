@@ -8,7 +8,7 @@
 #define STATIC_ASSERT_NOT(a) static_assert(!(a), #a);
 
 
-#define _T_INFO(t) #t, __FILE__, __LINE__
+#define _T_INFO(t) std::make_tuple(#t, __FILE__, __LINE__)
 #define _T_INFO1(t,a) std::forward_as_tuple(a), std::forward_as_tuple(#a), _T_INFO(t)
 #define _T_INFO2(t,a,b) std::forward_as_tuple(a, b), std::forward_as_tuple(#a, #b), _T_INFO(t)
 
@@ -71,7 +71,7 @@
 
 #define _CHECK_THROW(t,c,e,r) \
     { try { c; } \
-      catch (e const&) { caught = true; } \
+      catch (e const&) { cght__ = true; } \
       catch (...) { } \
       auto f = [=]{ return r; }; \
       vrac0x::testiculs::check( \
@@ -79,29 +79,29 @@
     }
 
 #define _CHECK_ANY_THROW(t,c,r) \
-    { try { c; } catch (...) { caught = true; } \
+    { try { c; } catch (...) { cght__ = true; } \
       auto f = [=]{ return r; }; \
       vrac0x::testiculs::check( \
           f, std::make_tuple(), std::forward_as_tuple(#c), _T_INFO(t)); \
     }
 
 #define CHECK_THROW(c,e) \
-    { bool caught = false; _CHECK_THROW(CHECK_THROW,c,e,caught) }
+    { bool cght__ = false; _CHECK_THROW(CHECK_THROW,c,e,cght__) }
 
 #define CHECK_ANY_THROW(c) \
-    { bool caught = false; _CHECK_ANY_THROW(CHECK_ANY_THROW,c,caught) }
+    { bool cght__ = false; _CHECK_ANY_THROW(CHECK_ANY_THROW,c,cght__) }
 
 #define CHECK_NO_THROW(c) \
-    { bool caught = false; _CHECK_ANY_THROW(CHECK_NO_THROW,c,!caught) }
+    { bool cght__ = false; _CHECK_ANY_THROW(CHECK_NO_THROW,c,!cght__) }
 
 #define ASSERT_THROW(c,e) \
-    { bool caught = false; _CHECK_THROW(ASSERT_THROW,c,e,caught) _ASSERT(caught); }
+    { bool cght__ = false; _CHECK_THROW(ASSERT_THROW,c,e,cght__) _ASSERT(cght__); }
 
 #define ASSERT_ANY_THROW(c) \
-    { bool caught = false; _CHECK_ANY_THROW(ASSERT_ANY_THROW,c,caught) _ASSERT(caught); }
+    { bool cght__ = false; _CHECK_ANY_THROW(ASSERT_ANY_THROW,c,cght__) _ASSERT(cght__); }
 
 #define ASSERT_NO_THROW(c) \
-    { bool caught = false; _CHECK_ANY_THROW(ASSERT_NO_THROW,c,!caught) _ASSERT(!caught); }
+    { bool cght__ = false; _CHECK_ANY_THROW(ASSERT_NO_THROW,c,!cght__) _ASSERT(!cght__); }
 
 
 #define PRINT(c) std::cout << #c << " : " << (c) << std::endl;
