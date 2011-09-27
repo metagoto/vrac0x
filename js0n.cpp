@@ -94,7 +94,7 @@ int main()
     }
 
     {
-        val j = empty_object;
+        val j = {}; //empty_object;
 
         j["key"] = 1;
         CHECK_EQ(j["key"], 1);
@@ -115,7 +115,7 @@ int main()
         CHECK_EQ(j2[2], 2);
         CHECK_ANY_THROW(j2[3]);
 
-        j2[0] = empty_object;
+        j2[0] = {}; //empty_object;
         CHECK_NO_THROW(j2[0]["key"]);
         CHECK_EQ(j2[0]["key"], null);
 

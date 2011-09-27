@@ -21,31 +21,33 @@ namespace vrac0x { namespace js0n
 
         struct k
         {
-            k(char_type const*);
+            constexpr explicit k(char_type const*);
 
-            pair operator=(array const&);
-
-            template<typename T>
-            pair operator=(T&&);
+            constexpr pair operator=(array const&);
 
             template<typename T>
-            pair operator=(std::initializer_list<T>);
+            constexpr typename std::enable_if<
+                !std::is_same<T,std::initializer_list<pair>>::value
+                ,pair
+            >::type operator=(T&&);
+
+            constexpr pair operator=(std::initializer_list<pair>);
 
             char_type const* const key;
         };
 
 
-        basic_val();
-        basic_val(int);
-        basic_val(double);
-        basic_val(bool);
-        basic_val(char_type const*);
-        basic_val(string const&);
-        basic_val(null_type);
-        basic_val(empty_array_type);
-        basic_val(empty_object_type);
+        constexpr basic_val();
+        constexpr basic_val(int);
+        constexpr basic_val(double);
+        constexpr basic_val(bool);
+        constexpr basic_val(char_type const*);
+        constexpr basic_val(string const&);
+        constexpr basic_val(null_type);
+        constexpr basic_val(empty_array_type);
+        constexpr basic_val(empty_object_type);
+        constexpr basic_val(array const&);
 
-        basic_val(array const&);
         basic_val(std::initializer_list<pair>);
         basic_val(std::initializer_list<self_type>);
 

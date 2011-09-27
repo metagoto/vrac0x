@@ -8,13 +8,14 @@ namespace vrac0x { namespace js0n
 {
 
     template<typename S, typename C>
-    inline basic_val<S,C>::k::k(char_type const* s)
+    constexpr inline basic_val<S,C>::k::k(char_type const* s)
         : key(s)
     { }
 
 
     template<typename S, typename C>
-    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(array const& a)
+    constexpr inline typename basic_val<S,C>::pair
+    basic_val<S,C>::k::operator=(array const& a)
     {
         return pair(key, a);
     }
@@ -22,85 +23,93 @@ namespace vrac0x { namespace js0n
 
     template<typename S, typename C>
     template<typename T>
-    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(T&& t)
+    constexpr inline typename
+    std::enable_if<
+        !std::is_same<T,std::initializer_list<typename basic_val<S,C>::pair>>::value
+        ,typename basic_val<S,C>::pair
+    >::type basic_val<S,C>::k::operator=(T&& t)
     {
         return pair(key, std::forward<T>(t));
     }
 
 
     template<typename S, typename C>
-    template<typename T>
-    inline typename basic_val<S,C>::pair basic_val<S,C>::k::operator=(std::initializer_list<T> list)
+    constexpr inline typename basic_val<S,C>::pair
+    basic_val<S,C>::k::operator=(std::initializer_list<pair> list)
     {
         return pair(key, list);
     }
 
 
-    /////////////
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val()
-        : type_(type_info::null)
-    { }
+    ///
 
 
     template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(basic_val<S,C>::char_type const* s)
-        : type_(type_info::string)
-        , s_(s)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(string const& s)
-        : type_(type_info::string)
-        , s_(s)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(int i)
-        : type_(type_info::int_)
-        , i_(i)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(double d)
-        : type_(type_info::double_)
-        , d_(d)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(bool b)
-        : type_(type_info::bool_)
-        , b_(b)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(null_type)
-        : type_(type_info::null)
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(empty_array_type)
-        : type_(type_info::array)
-        , a_()
-    { }
-
-
-    template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(empty_object_type)
+    constexpr inline basic_val<S,C>::basic_val()
+        //: type_(type_info::null) // used to be
+        //: basic_val(empty_object_type()) // waiting for constructor delegation
         : type_(type_info::object)
         , o_()
     { }
 
 
     template<typename S, typename C>
-    inline basic_val<S,C>::basic_val(array const& a)
+    constexpr inline basic_val<S,C>::basic_val(basic_val<S,C>::char_type const* s)
+        : type_(type_info::string)
+        , s_(s)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(string const& s)
+        : type_(type_info::string)
+        , s_(s)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(int i)
+        : type_(type_info::int_)
+        , i_(i)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(double d)
+        : type_(type_info::double_)
+        , d_(d)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(bool b)
+        : type_(type_info::bool_)
+        , b_(b)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(null_type)
+        : type_(type_info::null)
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(empty_array_type)
+        : type_(type_info::array)
+        , a_()
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(empty_object_type)
+        : type_(type_info::object)
+        , o_()
+    { }
+
+
+    template<typename S, typename C>
+    constexpr inline basic_val<S,C>::basic_val(array const& a)
         : type_(type_info::array)
         , a_(a)
     { }
