@@ -3,8 +3,9 @@
 #include "include/testiculs.hpp"
 
 
-// runtime hash
-uint64_t fnv1a_64(char const* s)
+// runtime hash for testing purpose
+template<typename T>
+uint64_t fnv1a_64(T const* s)
 {
     uint64_t const p = 1099511628211ULL;
     uint64_t h = 14695981039346656037ULL;
@@ -73,5 +74,10 @@ int main()
     STATIC_ASSERT(dum::a<h64("dispatch")>::value);
     STATIC_ASSERT_NOT(dum::a<h64("blah")>::value);
     STATIC_ASSERT_NOT(dum::a<h64("")>::value);
+
+    CHECK(fnv1a_64(L"") == h64(L""));
+    CHECK(fnv1a_64(u8"é") == h64(u8"é"));
+    CHECK(fnv1a_64(u"\0826") == h64(u"\0826"));
+    CHECK(fnv1a_64(U"\0826") == h64(U"\0826"));
 
 }
