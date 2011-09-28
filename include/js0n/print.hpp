@@ -35,22 +35,22 @@ namespace vrac0x { namespace js0n
                 std::cout << "]";
                 break;
             case type_info::string:
-                std::cout << get<string>(v);
+                std::cout << '"' << (char const*)v << '"';
                 break;
             case type_info::int_:
-                std::cout << get<int>(v); //(int)j;
+                std::cout << (int)v;
                 break;
             case type_info::double_:
-                std::cout << get<double>(v); //(double)j;
+                std::cout << (double)v;
                 break;
             case type_info::bool_:
-                std::cout << (get<bool>(v) ? "*true*" : "*false*");
+                std::cout << std::boolalpha << get<bool>(v); //(bool)v;
                 break;
             case type_info::null:
-                std::cout << "*null*";
+                std::cout << "null";
                 break;
             case type_info::undefined:
-                std::cout << "*undefined*";
+                std::cout << "undefined";
                 break;
             default:
                 std::cout << "*UNKNOWN*";
