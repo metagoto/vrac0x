@@ -41,6 +41,7 @@ namespace vrac0x { namespace js0n { namespace grammar
                 range<char,'a','z','A','Z','0','9'> // TODO broader range
                ,ch<char,' '>
                ,esc_ch
+               ,any_ch_but<char, '"'> // TODO
             >
         >
        ,ch<char,'"'>

@@ -36,13 +36,25 @@ int main()
         j = b(R"(["  blah  ", [], true])");
         PRINT(j);
 
-        j = b(R"([1,2.66, "str" , { "key" :  "val", "": [true, null] }, false,[]])");
+        j = b(R"(
+            [
+              1, 2.66, "str",
+              {
+                "key" :  "val",
+                ""    : [true, null]
+              }, false, [], {}
+            ]
+        )");
         PRINT(j);
 
-        j = b(R"( { "key" : "v\\al", "": [true, null] } )");
+        j = b(R"(
+            {
+               "key":"v\\al"
+              ,"": [true, null]}
+        )");
         PRINT(j);
 
-        j = b(std::string("{ \"key\" : \"val\", \"\": [true, null] }"));
+        j = b(std::string("{\"key\":\"val\",\"\":[true,null]}"));
         PRINT(j);
 
         j = b(R"("")");
@@ -59,6 +71,12 @@ int main()
         PRINT(j);
 
         j = b("");
+        PRINT(j);
+
+        j = b(u8R"(
+            { "日本語" : "ok",
+              "00" : [ "こちらは田中さんです", 3, "教えてもらった" ] }
+        )");
         PRINT(j);
     }
 
@@ -125,4 +143,5 @@ int main()
         //CHECK_EQ(j, true);
 
     }
+
 }

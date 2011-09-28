@@ -59,9 +59,11 @@ namespace vrac0x { namespace js0n
         template<typename V>
         struct type_to_mem<V, typename V::string>
         {
+            typedef typename V::string string;
+
             template<typename T>
             static typename std::conditional<
-                std::is_const<T>::value, typename V::string const*, typename V::string*
+                std::is_const<T>::value, string const*, string*
             >::type
             get(T& v)
             {
