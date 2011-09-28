@@ -61,7 +61,7 @@ namespace vrac0x { namespace js0n
         {
             template<typename T>
             static typename std::conditional<
-                std::is_const<T>::value, std::string const*, std::string*
+                std::is_const<T>::value, typename V::string const*, typename V::string*
             >::type
             get(T& v)
             {
