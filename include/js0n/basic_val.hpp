@@ -1,19 +1,26 @@
 #pragma once
 
+#include <type_traits>
+#include <initializer_list>
+
 
 namespace vrac0x { namespace js0n
 {
 
-    template<typename StrTag, typename ConTag>
+    template<typename Tag>
     struct basic_val
     {
 
-        typedef basic_val<StrTag,ConTag> self_type;
-        typedef typename traits<self_type,StrTag>::string_type string;
-        typedef typename traits<self_type,ConTag>::pair_type   pair;
-        typedef typename traits<self_type,ConTag>::array_type  array;
-        typedef typename traits<self_type,ConTag>::object_type object;
-        typedef typename traits<self_type,StrTag>::char_type   char_type;
+        typedef Tag            tag;
+        typedef basic_val<tag> self_type;
+
+        typedef typename traits<self_type,tag>::string_type string;
+        typedef typename traits<self_type,tag>::pair_type   pair;
+        typedef typename traits<self_type,tag>::array_type  array;
+        typedef typename traits<self_type,tag>::object_type object;
+        typedef typename traits<self_type,tag>::char_type   char_type;
+        typedef typename traits<self_type,tag>::int_type    int_type;
+        typedef typename traits<self_type,tag>::float_type  float_type;
 
         typedef detail::iter<self_type>       iterator;
         typedef detail::iter<self_type const> const_iterator;
@@ -38,8 +45,8 @@ namespace vrac0x { namespace js0n
 
 
         constexpr basic_val();
-        constexpr basic_val(int);
-        constexpr basic_val(double);
+        constexpr basic_val(int_type);
+        constexpr basic_val(float_type);
         constexpr basic_val(bool);
         constexpr basic_val(char_type const*);
         constexpr basic_val(string const&);
@@ -57,7 +64,24 @@ namespace vrac0x { namespace js0n
         basic_val(self_type&&);
         self_type& operator=(self_type&&);
 
-        // TODO add operator=(POD)
+        //// type coercion for arithmetic types (tmp)
+        //// TODO better integration with traits. excluse irrelevant ops
+        template<typename T, typename std::enable_if<
+            std::is_integral<T>::value,void>::type* = nullptr
+        >
+        constexpr inline basic_val(T t)
+            : type_(type_info::int_) // TODO constructor delegation
+            , i_(t)
+        { }
+
+        template<typename T, typename std::enable_if<
+            std::is_floating_point<T>::value,void>::type* = nullptr
+        >
+        constexpr inline basic_val(T t)
+            : type_(type_info::double_)
+            , d_(t)
+        { }
+        ////
 
         ~basic_val();
 
@@ -89,12 +113,12 @@ namespace vrac0x { namespace js0n
         type_info type_;
 
         union {
-            object o_;
-            array  a_;
-            string s_;
-            int    i_;
-            double d_;
-            bool   b_;
+            object     o_;
+            array      a_;
+            string     s_;
+            int_type   i_;
+            float_type d_;
+            bool       b_;
         };
 
 
