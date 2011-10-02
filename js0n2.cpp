@@ -56,6 +56,10 @@ int main()
 
         j = b(std::string("{\"key\":\"val\",\"\":[true,null]}"));
         PRINT(j);
+        typedef val::k k;
+        val j2 = { k("key") = "val", k("") = { true, null} };
+        CHECK_EQ(j, j2);
+        PRINT(j2);
 
         j = b(R"("")");
         PRINT(j);
@@ -66,6 +70,8 @@ int main()
         char const* s = "false";
         j = b(s, s+5);
         PRINT(j);
+        j2 = false;
+        CHECK_EQ(j, j2);
 
         j = b(R"(error)");
         PRINT(j);
@@ -131,17 +137,9 @@ int main()
 
         j = b("00");
         CHECK_EQ(j, null);
-    }
 
-    {
-        typedef vrac0x::js0n::basic_val<
-            vrac0x::js0n::tag::u32string
-           ,vrac0x::js0n::tag::deque
-        > val32;
-
-        //val32 j = parse<val32>(U"true"); // TODO std::stod etc
-        //CHECK_EQ(j, true);
-
+        j = b("10000000000.0");
+        CHECK_EQ(j, 10000000000.0);
     }
 
 }

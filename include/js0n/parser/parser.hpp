@@ -101,7 +101,8 @@ namespace vrac0x { namespace js0n
                         auto e = n->children.end();
                         for ( ; i != e; ++i) {
                             range_type const& r = (*i)->range();
-                            key = string_type{r.first, r.second};
+                            key = string_type{r.first, r.second}
+                                    .substr(1, std::distance(r.first, r.second)-2); /// TODO
                             ++i;
                             obj[key] = build<T>(i->get());
                         }

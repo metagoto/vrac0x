@@ -1,8 +1,11 @@
-#include <iostream>
 
 #include "include/js0n.hpp"
 #include "include/js0n/print.hpp"
 #include "include/testiculs.hpp"
+
+#include "include/js0n/traits/simple64.hpp"
+#include "include/js0n/traits/compact.hpp"
+#include "include/js0n/traits/large.hpp"
 
 
 int main()
@@ -234,51 +237,65 @@ int main()
     }
 
     {
-        typedef basic_val<tag::u32string, tag::deque> val32;
-        typedef val32::k k;
+        typedef basic_val<tag::simple64> val64;
+        typedef val64::k k;
 
-        val32 json = {
-            k(U"bool")  = true,
-            k(U"key")   = U"val",
-            k(U"other") = U"da value",
-            k(U"int")   = 42,
-            k(U"obj")   = {
-                k(U"key2") = null,
-                k(U"arr")  = {1, 2, U"STR", {3, 1.4142}, {k(U"dd") = 66}, false}
-            },
-            k(U"pi")    = 3.14
-        };
+        val64 j = -1234567890123456789; //45LL;
+        PRINT(j);
+        CHECK_EQ(j, -1234567890123456789);
+
+
+        j = 1;
+        PRINT(j);
+        CHECK_EQ(j, 1);
+
+        j = 2u;
+        PRINT(j);
+        CHECK_EQ(j, 2u);
+
+        j = 1.3f;
+        PRINT(j);
+        CHECK_EQ((float)j, 1.3f);
+
+        j = 1.2;
+        PRINT(j);
+        CHECK_EQ(j, 1.2);
 
     }
 
+    {
+        typedef basic_val<tag::compact> val;
 
-//    {
-//        struct test
-//        {
-//            val fa()
-//            {
-//                return { k("job") = "test", k("args") = {1, "ok", true} };
-//            }
+        val j = -1;
+        CHECK_EQ(j, (short)-1);
+        CHECK_EQ(j, -1);
+        CHECK_EQ(j, -1L);
+        CHECK_EQ(j, -1LL);
 
-//            void fb(val const& v)
-//            {
-//                PRINT(v);
-//            }
-//        };
+        j = 1.2;
+        CHECK_EQ(j, 1.2);
+        CHECK_EQ(j, 1.2f);
+        CHECK_EQ(j, (double)1.2);
+        CHECK_EQ(j, (long double)1.2);
+    }
 
-//        test t;
-//        val j = t.fa();
-//        PRINT(j);
 
-//        t.fb(j);
-//        t.fb({1,2,3,null});
+    {
+        typedef basic_val<tag::large> val;
 
-//        PRINT(j.size()); // obj
-//        PRINT(j["args"].size()); // arr
-//        PRINT(j["args"][1].size()); // str
-//        PRINT(j["args"][2].size()); // other
+        val j = -1;
+        CHECK_EQ(j, (short)-1);
+        CHECK_EQ(j, -1);
+        CHECK_EQ(j, -1L);
+        CHECK_EQ(j, -1LL);
 
-//        //PRINT(typeid(int));
-//    }
+        j = 1.2;
+        CHECK_EQ(j, 1.2);
+        CHECK_EQ(j, 1.2f);
+        CHECK_EQ(j, (double)1.2);
+        CHECK_EQ(j, (long double)1.2);
+
+    }
+
 
 }

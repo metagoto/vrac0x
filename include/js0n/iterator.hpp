@@ -176,31 +176,31 @@ namespace vrac0x { namespace js0n
     }
 
 
-    template<typename S, typename C>
-    typename basic_val<S,C>::iterator begin(basic_val<S,C>& v)
+    template<typename T>
+    typename basic_val<T>::iterator begin(basic_val<T>& v)
     {
-        return typename basic_val<S,C>::iterator(v);
+        return typename basic_val<T>::iterator(v);
     }
 
 
-    template<typename S, typename C>
-    typename basic_val<S,C>::iterator end(basic_val<S,C>& v)
+    template<typename T>
+    typename basic_val<T>::iterator end(basic_val<T>& v)
     {
-        return typename basic_val<S,C>::iterator(v, true);
+        return typename basic_val<T>::iterator(v, true);
     }
 
 
-    template<typename S, typename C>
-    typename basic_val<S,C>::const_iterator begin(basic_val<S,C> const& v)
+    template<typename T>
+    typename basic_val<T>::const_iterator begin(basic_val<T> const& v)
     {
-        return typename basic_val<S,C>::const_iterator(v);
+        return typename basic_val<T>::const_iterator(v);
     }
 
 
-    template<typename S, typename C>
-    typename basic_val<S,C>::const_iterator end(basic_val<S,C> const& v)
+    template<typename T>
+    typename basic_val<T>::const_iterator end(basic_val<T> const& v)
     {
-        return typename basic_val<S,C>::const_iterator(v, true);
+        return typename basic_val<T>::const_iterator(v, true);
     }
 
 
