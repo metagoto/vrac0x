@@ -47,7 +47,7 @@ namespace vrac0x { namespace js0n
                 std::cout << get<float_type>(v);
                 break;
             case type_info::bool_:
-                std::cout << std::boolalpha << get<bool>(v); //(bool)v;
+                std::cout << std::boolalpha << get<bool>(v);
                 break;
             case type_info::null:
                 std::cout << "null";
