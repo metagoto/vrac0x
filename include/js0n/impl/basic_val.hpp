@@ -116,6 +116,22 @@ namespace vrac0x { namespace js0n
 
 
     template<typename T>
+    template<typename U, typename>
+    constexpr inline basic_val<T>::basic_val(U t)
+        : type_(type_info::int_) // TODO constructor delegation
+        , i_(t)
+    { }
+
+
+    template<typename T>
+    template<typename U, typename, typename>
+    constexpr inline basic_val<T>::basic_val(U t)
+        : type_(type_info::double_)
+        , d_(t)
+    { }
+
+
+    template<typename T>
     inline basic_val<T>::basic_val(std::initializer_list<pair> list)
         : type_(type_info::object)
         , o_(list.size())

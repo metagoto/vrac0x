@@ -56,6 +56,13 @@ namespace vrac0x { namespace js0n
         constexpr basic_val(empty_object_type);
         constexpr basic_val(array const&);
 
+        //// type coercion for arithmetic types (tmp)
+        //// TODO better integration with traits. exclude irrelevant ops
+        template<typename T, ENABLE_IF(std::is_integral<T>::value)>
+        constexpr basic_val(T);
+        template<typename T, ENABLE_IF(std::is_floating_point<T>::value), typename = void>
+        constexpr basic_val(T);
+
         basic_val(std::initializer_list<pair>);
         basic_val(std::initializer_list<self_type>);
 
@@ -64,20 +71,6 @@ namespace vrac0x { namespace js0n
 
         basic_val(self_type&&);
         self_type& operator=(self_type&&);
-
-        //// type coercion for arithmetic types (tmp)
-        //// TODO better integration with traits. exclude irrelevant ops
-        template<typename T, ENABLE_IF(std::is_integral<T>::value)>
-        constexpr inline basic_val(T t)
-            : type_(type_info::int_) // TODO constructor delegation
-            , i_(t)
-        { }
-
-        template<typename T, ENABLE_IF(std::is_floating_point<T>::value), typename = void>
-        constexpr inline basic_val(T t)
-            : type_(type_info::double_)
-            , d_(t)
-        { }
 
         ~basic_val();
 
