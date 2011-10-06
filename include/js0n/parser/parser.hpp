@@ -7,25 +7,28 @@
 namespace vrac0x { namespace veg
 {
     template<> struct type_to_int<js0n::grammar::string>
-    {  static const int value = 1; };
+    {  static constexpr int value = 1; };
 
-    template<> struct type_to_int<js0n::grammar::number>
-    {  static const int value = 2; };
+    template<> struct type_to_int<js0n::grammar::integer>
+    {  static constexpr int value = 2; };
+
+    template<> struct type_to_int<js0n::grammar::decimal>
+    {  static constexpr int value = 3; };
 
     template<> struct type_to_int<js0n::grammar::object>
-    {  static const int value = 3; };
+    {  static constexpr int value = 4; };
 
     template<> struct type_to_int<js0n::grammar::array>
-    {  static const int value = 4; };
+    {  static constexpr int value = 5; };
 
     template<> struct type_to_int<js0n::grammar::true_>
-    {  static const int value = 5; };
+    {  static constexpr int value = 6; };
 
     template<> struct type_to_int<js0n::grammar::false_>
-    {  static const int value = 6; };
+    {  static constexpr int value = 7; };
 
     template<> struct type_to_int<js0n::grammar::null>
-    {  static const int value = 7; };
+    {  static constexpr int value = 8; };
 } }
 
 
@@ -36,16 +39,28 @@ namespace vrac0x { namespace js0n
     inline namespace detail
     {
 
+        enum class kind : int
+        {
+            string = 1,
+            integer,
+            decimal,
+            object,
+            array,
+            true_,
+            false_,
+            null
+        };
+
+
         template<typename It>
         struct parser : public vrac0x::veg::ast<It>
         {
 
             typedef It iterator_type;
+            typedef typename vrac0x::veg::ast<iterator_type>::node_base node_type;
             typedef typename vrac0x::veg::ast<iterator_type>::range_type range_type;
             typedef typename std::iterator_traits<iterator_type>::value_type char_type;
             typedef std::basic_string<char_type> string_type;
-            typedef typename vrac0x::veg::ast<iterator_type>::node_base node_type;
-
 
             parser(iterator_type beg, iterator_type end)
                 : begin(beg)
@@ -70,61 +85,65 @@ namespace vrac0x { namespace js0n
 
 
          private:
+
             template<typename T>
-            T build(node_type* n)
+            T build(node_type const* n)
             {
 
-                switch (n->type())
+                switch ((kind)n->type())
                 {
-                    case 1 : { // string
+                    case kind::string :
+                    {
                         range_type const& r = n->range();
-                        return string_type{r.first, r.second}
-                            .substr(1, std::distance(r.first, r.second)-2);
+                        return string_type{std::next(r.first), std::prev(r.second)};
                     }
-                    case 2 : { // num
+                    case kind::integer :
+                    {
                         range_type const& r = n->range();
-                        string_type s{r.first, r.second};
-                        if (s.find_first_of('.') != string_type::npos)
-                            return std::stod(s); // TODO: does not have unicode str overloads
-                        return std::stoi(s);
+                        return std::stoi(string_type{r.first, r.second});
                     }
-                    case 5 :
+                    case kind::decimal :
+                    {
+                        range_type const& r = n->range();
+                        return std::stod(string_type{r.first, r.second});
+                    }
+                    case kind::true_ :
                         return true;
-                    case 6 :
+                    case kind::false_ :
                         return false;
-                    case 7 :
+                    case kind::null :
                         return null_type();
-                    case 3 :  { // obj
-                        T obj = {};
-                        string_type key;
-                        auto i = n->children.begin();
-                        auto e = n->children.end();
-                        for ( ; i != e; ++i) {
+                    case kind::object :
+                    {
+                        T o = {};
+                        for (auto i(n->children.cbegin()), e(n->children.cend())
+                            ;i != e; ++i)
+                        {
                             range_type const& r = (*i)->range();
-                            key = string_type{r.first, r.second}
-                                    .substr(1, std::distance(r.first, r.second)-2); /// TODO
-                            ++i;
-                            obj[key] = build<T>(i->get());
+                            o[string_type{std::next(r.first), std::prev(r.second)}]
+                                = build<T>((++i)->get());
                         }
-                        return obj;
+                        return o;
                     }
-                    case 4 : { // array
-                        T arr = empty_array;
-                        typedef typename T::array array_type;
-                        array_type& raw_arr = get<array_type>(arr);
-                        auto i = n->children.begin();
-                        auto e = n->children.end();
-                        for ( ; i != e; ++i) {
-                            raw_arr.push_back(build<T>(i->get()));
+                    case kind::array :
+                    {
+                        T a = empty_array;
+                        auto& ra = get<typename T::array>(a);
+                        ra.reserve(n->children.size());
+                        for (auto i(n->children.cbegin()), e(n->children.cend())
+                            ;i != e; ++i)
+                        {
+                            ra.push_back(build<T>(i->get()));
                         }
-                        return arr;
+                        return a;
                     }
-                    case 0 : // should not reach
                     default :
                         break;
                 }
-                return T();
+
+                return null_type(); ///TODO
             }
+
 
             iterator_type begin;
             iterator_type end;

@@ -91,6 +91,10 @@ namespace vrac0x { namespace js0n { namespace grammar
         ,opt<exp>
     > {};
 
+    typedef seq<int_> integer;
+
+    typedef seq<int_, frac, opt<exp> > decimal;
+
 
     // obj
     struct value;
@@ -144,7 +148,9 @@ namespace vrac0x { namespace js0n { namespace grammar
     tok<
         alter<
             store<string>
-           ,store<number>
+           //,store<number>
+           ,store<decimal>
+           ,store<integer>
            ,store<object>
            ,store<array>
            ,store<true_>

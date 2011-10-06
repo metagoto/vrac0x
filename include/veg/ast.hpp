@@ -67,7 +67,8 @@ namespace vrac0x { namespace veg
                 auto i = children.begin();
                 auto e = children.end();
                 for ( ; i != e; ++i) {
-                    std::cout << depth << "; " << (*i)->str() << " TYPE: " << (*i)->type() << std::endl;
+                    std::cout << depth << "; " << (*i)->str()
+                              << " TYPE: " << (*i)->type() << std::endl;
                     (*i)->traverse(depth+1);
                 }
             }
