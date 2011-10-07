@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../veg/context.hpp"
-#include "../../veg/ast.hpp"
+#include "../../veg/ast_stack.hpp"
 
 
 namespace vrac0x { namespace veg
@@ -53,12 +53,11 @@ namespace vrac0x { namespace js0n
 
 
         template<typename It>
-        struct parser : public vrac0x::veg::ast<It>
+        struct parser : public vrac0x::veg::ast_stack<It>
         {
 
             typedef It iterator_type;
-            typedef typename vrac0x::veg::ast<iterator_type>::node_base node_type;
-            typedef typename vrac0x::veg::ast<iterator_type>::range_type range_type;
+            typedef vrac0x::veg::ast_stack<It> base_type;
             typedef typename std::iterator_traits<iterator_type>::value_type char_type;
             typedef std::basic_string<char_type> string_type;
 
@@ -75,10 +74,10 @@ namespace vrac0x { namespace js0n
                     iterator_type, parser
                 > ctx(begin, end, *this);
 
-                if (grammar::json::match(ctx) && this->root()->children.size())
+                if (grammar::json::match(ctx) && !this->container().empty())
                 {
-                    //traverse();
-                    return build<T>((*(this->root()->children.begin())).get());
+                    std::size_t start = 0;
+                    return build<T>(start);
                 }
                 return null;
             }
@@ -87,63 +86,52 @@ namespace vrac0x { namespace js0n
          private:
 
             template<typename T>
-            T build(node_type const* n)
+            T build(std::size_t& start)
             {
+               typename base_type::item const& si = this->container()[start++];
 
-                switch ((kind)n->type())
-                {
-                    case kind::string :
-                    {
-                        range_type const& r = n->range();
-                        return string_type{std::next(r.first), std::prev(r.second)};
-                    }
-                    case kind::integer :
-                    {
-                        range_type const& r = n->range();
-                        return std::stoi(string_type{r.first, r.second});
-                    }
-                    case kind::decimal :
-                    {
-                        range_type const& r = n->range();
-                        return std::stod(string_type{r.first, r.second});
-                    }
-                    case kind::true_ :
-                        return true;
-                    case kind::false_ :
-                        return false;
-                    case kind::null :
-                        return null_type();
-                    case kind::object :
-                    {
-                        T o = {};
-                        for (auto i(n->children.cbegin()), e(n->children.cend())
-                            ;i != e; ++i)
-                        {
-                            range_type const& r = (*i)->range();
-                            o[string_type{std::next(r.first), std::prev(r.second)}]
-                                = build<T>((++i)->get());
-                        }
-                        return o;
-                    }
-                    case kind::array :
-                    {
-                        T a = empty_array;
-                        auto& ra = get<typename T::array>(a);
-                        ra.reserve(n->children.size());
-                        for (auto i(n->children.cbegin()), e(n->children.cend())
-                            ;i != e; ++i)
-                        {
-                            ra.push_back(build<T>(i->get()));
-                        }
-                        return a;
-                    }
-                    default :
-                        break;
-                }
+               switch ((kind)si.type())
+               {
+                   case kind::string :
+                       return string_type{std::next(si.begin()), std::prev(si.end())};
+                   case kind::integer :
+                       return std::stoi(string_type{si.begin(), si.end()});
+                   case kind::decimal :
+                       return std::stod(string_type{si.begin(), si.end()});
+                   case kind::true_ :
+                       return true;
+                   case kind::false_ :
+                       return false;
+                   case kind::object :
+                   {
+                       T o = {};
+                       //auto& ro = get<typename T::object>(o);
+                       //ro.reserve(5);
+                       std::size_t e = start+si.delta();
+                       for ( ; start != e;)
+                       {
+                           typename base_type::item const& ssi = this->container()[start++];
+                           o[string_type{std::next(ssi.begin()), std::prev(ssi.end())}]
+                               = build<T>(start);
+                       }
+                       return o;
+                   }
+                   case kind::array :
+                   {
+                       T a = empty_array;
+                       auto& ra = get<typename T::array>(a);
+                       //ra.reserve(5);
+                       std::size_t e = start+si.delta();
+                       for ( ; start != e;)
+                           ra.push_back(build<T>(start));
+                       return a;
+                   }
+                   default :
+                      break;
+              }
 
-                return null_type(); ///TODO
+              return null_type();
             }
-
 
             iterator_type begin;
             iterator_type end;
