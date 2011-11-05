@@ -6,6 +6,7 @@
 #include "include/js0n/traits/simple64.hpp"
 #include "include/js0n/traits/compact.hpp"
 #include "include/js0n/traits/large.hpp"
+#include "include/js0n/traits/deque.hpp"
 
 
 int main()
@@ -13,21 +14,17 @@ int main()
     using namespace vrac0x::js0n;
     typedef val::k k;
 
-    // when the compiler supports user defined literals
-    // we should be able to "coolify" the object's keys notation
-    // with something like: "key"k = value
-    // for now, k("key") = value
 
     val json = {
-        k("bool")  = true,
-        k("key")   = "val",
-        k("other") = "da value",
-        k("int")   = 42,
-        k("obj")   = {
-            k("key2") = null,
-            k("arr")  = {1, 2, "STR", {3, 1.4142}, {k("dd") = 66}, false}
+        "bool"_k  = true,
+        "key"_k   = "val",
+        "other"_k = "da value",
+        "int"_k   = 42,
+        "obj"_k   = {
+            "key2"_k = null,
+            "arr"_k  = {1, 2, "STR", {3, 1.4142}, {"dd"_k = 66}, false}
         },
-        k("pi")    = 3.14
+        "pi"_k    = 3.14
     };
 
 
@@ -277,8 +274,32 @@ int main()
         CHECK_EQ(j, 1.2f);
         CHECK_EQ(j, (double)1.2);
         CHECK_EQ(j, (long double)1.2);
+
+        j = { 1, 1.1f, 1.1, (long double)1.1, (short)2, 2, 2L, 22222222222228LL};
+        PRINT(j);
+
     }
 
+
+    {
+        typedef basic_val<tag::simple> val;
+
+        val j = -1;
+        CHECK_EQ(j, (short)-1);
+        CHECK_EQ(j, -1);
+        CHECK_EQ(j, -1L);
+        CHECK_EQ(j, -1LL);
+
+        j = 1.2;
+        CHECK_EQ(j, 1.2);
+        CHECK_EQ(j, 1.2f);
+        CHECK_EQ(j, (double)1.2);
+        CHECK_EQ(j, (long double)1.2);
+
+        j = { 1, 1.1f, 1.1, (long double)1.1, (short)2, 2, 2L, 22222222222228LL};
+        PRINT(j);
+
+    }
 
     {
         typedef basic_val<tag::large> val;
@@ -294,6 +315,39 @@ int main()
         CHECK_EQ(j, 1.2f);
         CHECK_EQ(j, (double)1.2);
         CHECK_EQ(j, (long double)1.2);
+
+        std::cout << sizeof(basic_val<tag::compact>) << std::endl;
+        std::cout << sizeof(basic_val<tag::simple>) << std::endl;
+        std::cout << sizeof(basic_val<tag::simple64>) << std::endl;
+        std::cout << sizeof(basic_val<tag::large>) << std::endl;
+        std::cout << sizeof(basic_val<tag::deque>) << std::endl;
+
+        j = { 1, 1.1f, 1.1, (long double)1.1, (short)2, 2, 2L, 22222222222228LL};
+        PRINT(j);
+
+    }
+
+    {
+        typedef basic_val<tag::deque> val;
+
+        val j = -1;
+        CHECK_EQ(j, (short)-1);
+        CHECK_EQ(j, -1);
+        CHECK_EQ(j, -1L);
+        CHECK_EQ(j, -1LL);
+
+        j = 1.2;
+        CHECK_EQ(j, 1.2);
+        CHECK_EQ(j, 1.2f);
+        CHECK_EQ(j, (double)1.2);
+        CHECK_EQ(j, (long double)1.2);
+
+        j = { 1, 1.1f, 1.1, (long double)1.1, (short)2, 2, 2L, 22222222222228LL};
+        PRINT(j);
+
+        CHECK_EQ((double)1.2f, (double)1.2);
+        std::cout << ((double)1.2f == (double)1.2) << std::endl;
+        std::cout << (double)1.2f << " " << (double)1.2 << std::endl;
 
     }
 
