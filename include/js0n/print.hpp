@@ -9,7 +9,7 @@ namespace vrac0x { namespace js0n
 
     // temp
     template<typename T>
-    inline void print(basic_val<T> const& v)
+    inline void print(std::ostream& o, basic_val<T> const& v)
     {
         typedef typename basic_val<T>::string string;
         typedef typename basic_val<T>::pair   pair;
@@ -21,42 +21,42 @@ namespace vrac0x { namespace js0n
         switch (v.type())
         {
             case type_info::object:
-                std::cout << "{\n";
+                o << "{\n";
                 for (pair const& p : get<object>(v)) {
-                    std::cout << '"' << p.first << "\": ";
-                    print(p.second);
-                    std::cout << ",\n";
+                    o << '"' << p.first << "\": ";
+                    print(o, p.second);
+                    o << ",\n";
                 }
-                std::cout << "}\n";
+                o << "}\n";
                 break;
             case type_info::array:
-                std::cout << "[ ";
+                o << "[ ";
                 for (basic_val<T> const& w : get<array>(v)) {
-                    print(w);
-                    std::cout << ", ";
+                    print(o, w);
+                    o << ", ";
                 }
-                std::cout << "]";
+                o << "]";
                 break;
             case type_info::string:
-                std::cout << '"' << get<string>(v) << '"';
+                o << '"' << get<string>(v) << '"';
                 break;
             case type_info::int_:
-                std::cout << get<int_type>(v);
+                o << get<int_type>(v);
                 break;
             case type_info::double_:
-                std::cout << get<float_type>(v);
+                o << get<float_type>(v);
                 break;
             case type_info::bool_:
-                std::cout << std::boolalpha << get<bool>(v);
+                o << std::boolalpha << get<bool>(v);
                 break;
             case type_info::null:
-                std::cout << "null";
+                o << "null";
                 break;
             case type_info::undefined:
-                std::cout << "undefined";
+                o << "undefined";
                 break;
             default:
-                std::cout << "*UNKNOWN*";
+                o << "*UNKNOWN*";
 
         }
     }
@@ -68,7 +68,7 @@ namespace vrac0x { namespace js0n
 template<typename T>
 std::ostream& operator<<(std::ostream& o, vrac0x::js0n::basic_val<T> const& v)
 {
-    vrac0x::js0n::print(v);
+    vrac0x::js0n::print(o, v);
     return o;
 }
 
