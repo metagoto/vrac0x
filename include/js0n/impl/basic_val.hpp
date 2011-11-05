@@ -116,6 +116,34 @@ namespace vrac0x { namespace js0n
 
 
     template<typename T>
+    constexpr inline basic_val<T>::basic_val(object const& o)
+        : type_(type_info::object)
+        , o_(o)
+    { }
+
+
+    template<typename T>
+    constexpr inline basic_val<T>::basic_val(string&& s)
+        : type_(type_info::string)
+        , s_(std::move(s))
+    { }
+
+
+    template<typename T>
+    constexpr inline basic_val<T>::basic_val(array&& a)
+        : type_(type_info::array)
+        , a_(std::move(a))
+    { }
+
+
+    template<typename T>
+    constexpr inline basic_val<T>::basic_val(object&& o)
+        : type_(type_info::object)
+        , o_(std::move(o))
+    { }
+
+
+    template<typename T>
     template<typename U, typename>
     constexpr inline basic_val<T>::basic_val(U t)
         : type_(type_info::int_) // TODO constructor delegation
@@ -195,7 +223,10 @@ namespace vrac0x { namespace js0n
         if (type() != type_info::array)
             throw std::invalid_argument("not an array");
 
-        return a_.at(i); // may throw. no insertion (for now?)
+        if (i >= a_.size())
+            a_.resize(i+1);
+
+        return a_[i];
     }
 
 
@@ -212,9 +243,8 @@ namespace vrac0x { namespace js0n
         if (it != o_.end())
             return it->second;
 
-        // same as std::map. insert if non existent
         o_.push_back(pair(s, null_type()));
-        return o_.at(o_.size()-1).second;
+        return o_.back().second;
     }
 
 
@@ -229,14 +259,30 @@ namespace vrac0x { namespace js0n
     template<typename T>
     inline basic_val<T> const& basic_val<T>::operator[](std::size_t i) const
     {
-        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](i));
+        if (type() != type_info::array)
+            throw std::invalid_argument("not an array");
+
+        if (i >= a_.size())
+            throw std::out_of_range();
+
+        return a_[i];
     }
 
 
     template<typename T>
     inline basic_val<T> const& basic_val<T>::operator[](string const& s) const
     {
-        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](s));
+        if (type() != type_info::object)
+            throw std::invalid_argument("not an object");
+
+        auto it = std::find_if(o_.begin(), o_.end(), [&s](pair const& p){
+            return p.first == s;
+        });
+
+        if (it != o_.end())
+            return it->second;
+
+        throw std::out_of_range(s);
     }
 
 
@@ -244,7 +290,7 @@ namespace vrac0x { namespace js0n
     template<std::size_t N>
     inline basic_val<T> const& basic_val<T>::operator[](char_type const(&s)[N]) const
     {
-        return const_cast<self_type const&>(const_cast<self_type*>(this)->operator[](string(s)));
+        return this->operator[](string(s));
     }
 
 

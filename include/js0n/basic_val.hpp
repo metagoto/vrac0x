@@ -55,6 +55,11 @@ namespace vrac0x { namespace js0n
         constexpr basic_val(empty_array_type);
         constexpr basic_val(empty_object_type);
         constexpr basic_val(array const&);
+        constexpr basic_val(object const&);
+
+        constexpr basic_val(string&&);
+        constexpr basic_val(array&&);
+        constexpr basic_val(object&&);
 
         //// type coercion for arithmetic types (tmp)
         //// TODO better integration with traits. exclude irrelevant ops
