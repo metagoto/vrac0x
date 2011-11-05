@@ -80,4 +80,12 @@ int main()
     CHECK(fnv1a_64(u"\0826") == h64(u"\0826"));
     CHECK(fnv1a_64(U"\0826") == h64(U"\0826"));
 
+
+    using namespace vrac0x::fnv1a::literals;
+
+    STATIC_ASSERT(check<"hello world"_h64>::value);
+    STATIC_ASSERT(dum::a<"dispatch"_h64>::value);
+    STATIC_ASSERT_NOT(dum::a<"blah"_h64>::value);
+    STATIC_ASSERT_NOT(dum::a<""_h64>::value);
+
 }
