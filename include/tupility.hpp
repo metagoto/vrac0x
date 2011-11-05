@@ -9,7 +9,7 @@ namespace vrac0x
 
     template<std::size_t I = 0, typename... T>
     inline typename std::enable_if<I == sizeof...(T), void>::type
-    print_tuple(std::ostream& os, std::tuple<T...> const& t)
+    print_tuple(std::ostream&, std::tuple<T...> const&)
     { }
 
 
