@@ -21,11 +21,9 @@ namespace vrac0x { namespace veg
     {
 
         struct item;
-        struct tstack;
 
         typedef Iterator                         iterator_type;
         typedef std::vector<item>                container_type;
-        typedef std::stack<item, container_type> stack_type;
 
 
         struct item
@@ -63,64 +61,32 @@ namespace vrac0x { namespace veg
         };
 
 
-        struct tstack : stack_type
-        {
-            typedef stack_type base_type;
-
-            std::size_t finalize(iterator_type e, std::size_t index)
-            {
-                item& i = this->c[index];
-                i.end_ = e;
-                i.delta_ = this->size() - index - 1;
-                return i.parent_;
-            }
-
-            std::size_t push(item&& i)
-            {
-                base_type::emplace(std::move(i));
-                return this->size() - 1;
-            }
-
-
-            typename base_type::container_type& container()
-            {
-                return this->c;
-            }
-
-//            void traverse()
-//            {
-//                for (std::size_t i = 0; i < this->c.size(); ++i)
-//                {
-//                    item& si = this->c[i];
-//                    std::cout << i << " t: " << si.type << " d: " << si.delta << std::endl;
-//                }
-//            }
-        };
-
-
-
         void finalize_node(iterator_type e)
         {
-            c_ = s_.finalize(e, c_);
+            item& i = s_[c_];
+            i.end_ = e;
+            i.delta_ = s_.size() - c_ - 1;
+            c_ = i.parent_;
         }
 
         void forget_node()
         {
-            item const& i = s_.top();
+            item const& i = s_.back();
             c_ = i.parent_;
-            s_.pop();
+            s_.pop_back();
         }
 
         template<typename T>
         void create_node(iterator_type s)
         {
-            c_ = s_.push(item(type_to_int<T>::value, s, c_));
+            s_.push_back(item(type_to_int<T>::value, s, c_));
+            c_ = s_.size() - 1;
         }
 
 
-        typename tstack::container_type& container()
+        container_type& container()
         {
-           return s_.container();
+           return s_;
         }
 
 
@@ -130,11 +96,21 @@ namespace vrac0x { namespace veg
 //        }
 
 
+        void reset()
+        {
+            s_.clear();
+        }
+
+//        ast_stack()
+//        {
+//            s_.reserve(5);
+//        }
+
+
     private:
-        tstack      s_;
-        std::size_t c_;
+        container_type s_;
+        std::size_t    c_;
 
     };
-
 
 } } //ns

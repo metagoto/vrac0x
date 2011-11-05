@@ -5,6 +5,7 @@
 #include "../../veg/store.hpp"
 
 
+
 namespace vrac0x { namespace js0n { namespace grammar
 {
 
@@ -16,14 +17,14 @@ namespace vrac0x { namespace js0n { namespace grammar
     typedef star<space> ws;
 
     template<typename T>
-    struct tok : seq<ws, T, ws> {};
+    struct tok : seq</*ws,*/ T, ws> {};
 
     template<char C>
-    struct ch_tok : seq<ws, ch<char,C>, ws> {};
+    struct ch_tok : seq</*ws,*/ ch<char,C>, ws> {};
 
-    typedef ch<char,'t','r','u','e'>     true_;
-    typedef ch<char,'f','a','l','s','e'> false_;
-    typedef ch<char,'n','u','l','l'>     null;
+    struct true_ : seq<ch<char,'t'>, store<ch<char,'r','u','e'>, true_> > {};
+    struct false_: seq<ch<char,'f'>, store<ch<char,'a','l','s', 'e'>, false_> > {};
+    struct null  : seq<ch<char,'n'>, store<ch<char,'u','l','l'>, null> > {};
 
 
     // str
@@ -33,19 +34,21 @@ namespace vrac0x { namespace js0n { namespace grammar
        ,set<char,'"', '/', '\\', 'b', 'f', 'n', 'r', 't', 'u'>
     > esc_ch;
 
-    typedef
+    struct string :
     seq<
         ch<char,'"'>
-       ,star<
-            alter<
-                range<char,'a','z','A','Z','0','9'> // TODO broader range
-               ,ch<char,' '>
-               ,esc_ch
-               ,any_ch_but<char, '"'> // TODO
+       ,store<
+            star<
+                alter<
+                    esc_ch
+                   ,any_ch_but<char, '"'> // TODO
+                >
             >
+           ,string
         >
        ,ch<char,'"'>
-    > string;
+    >
+    {};
 
 
     // num
@@ -53,9 +56,7 @@ namespace vrac0x { namespace js0n { namespace grammar
     typedef range<char,'1','9'> digit19;
 
     typedef
-    alter<
-        seq<ch<char,'e'>, opt<set<char,'+','-'>>>
-       ,seq<ch<char,'E'>, opt<set<char,'+','-'>>>
+    seq< set<char,'e', 'E'>, opt<set<char,'+','-'> >
     > e;
 
     struct digits :
@@ -91,9 +92,14 @@ namespace vrac0x { namespace js0n { namespace grammar
         ,opt<exp>
     > {};
 
-    typedef seq<int_> integer;
 
-    typedef seq<int_, frac, opt<exp> > decimal;
+    struct integer :
+        seq<peek<alter<digit,ch<char,'-'>>>, store< seq<int_, opt<exp> >, integer> >
+    {};
+
+    struct decimal :
+        seq<peek<alter<digit,ch<char,'-'>>>, store< seq<int_,frac,opt<exp> >, decimal> >
+    {};
 
 
     // obj
@@ -101,7 +107,7 @@ namespace vrac0x { namespace js0n { namespace grammar
 
     struct kv_pair :
     seq<
-        tok<store<string>>
+        tok<string>
        ,ch_tok<':'>
        ,value
     > {};
@@ -109,16 +115,19 @@ namespace vrac0x { namespace js0n { namespace grammar
     struct object :
     seq<
         ch_tok<'{'>
-       ,opt<
-            seq<
-                kv_pair
-               ,star<
-                    seq<
-                        ch_tok<','>
-                       ,kv_pair
+       ,store<
+            opt<
+                seq<
+                    kv_pair
+                   ,star<
+                        seq<
+                            ch_tok<','>
+                           ,kv_pair
+                        >
                     >
                 >
             >
+           ,object
         >
        ,ch<char,'}'>
     > {};
@@ -128,16 +137,19 @@ namespace vrac0x { namespace js0n { namespace grammar
     struct array :
     seq<
         ch_tok<'['>
-       ,opt<
-            seq<
-                value
-               ,star<
-                    seq<
-                        ch_tok<','>
-                      ,value
+       ,store<
+            opt<
+                seq<
+                    value
+                   ,star<
+                        seq<
+                            ch_tok<','>
+                           ,value
+                        >
                     >
                 >
             >
+           ,array
         >
        ,ch<char,']'>
     > {};
@@ -147,15 +159,14 @@ namespace vrac0x { namespace js0n { namespace grammar
     struct value :
     tok<
         alter<
-            store<string>
-           //,store<number>
-           ,store<decimal>
-           ,store<integer>
-           ,store<object>
-           ,store<array>
-           ,store<true_>
-           ,store<false_>
-           ,store<null>
+            string
+           ,decimal
+           ,integer
+           ,object
+           ,array
+           ,true_
+           ,false_
+           ,null
         >
     > {};
 
@@ -163,7 +174,8 @@ namespace vrac0x { namespace js0n { namespace grammar
     // json
     struct json :
     seq<
-        value
+        ws
+       ,value
        ,eoi
     > {};
 

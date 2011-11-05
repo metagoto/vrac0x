@@ -21,7 +21,7 @@ struct context
     }
 
 
-    iterator_type pos()
+    iterator_type pos() const
     {
         return it;
     }
@@ -31,7 +31,7 @@ struct context
         it = i;
     }
 
-    value_type operator*()
+    value_type operator*() const
     {
         return *it;
     }
@@ -46,7 +46,7 @@ struct context
         return it++;
     }
 
-    bool eoi()
+    bool eoi() const
     {
         return it == end;
     }
@@ -69,7 +69,7 @@ struct tree_context : public context<Iterator>
     {
     }
 
-    Tree& tree()
+    Tree& tree() const
     {
         return outer_tree;
     }
