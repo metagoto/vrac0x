@@ -24,7 +24,7 @@ namespace vrac0x
         struct unpack<R, 0>
         {
             template<typename F, typename... P, typename... T>
-            constexpr static R apply(F&& f, std::tuple<P...> const& p, T&&... t)
+            constexpr static R apply(F&& f, std::tuple<P...> const&, T&&... t)
             {
                 return f(std::forward<T>(t)...);
             }
