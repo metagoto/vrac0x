@@ -14,8 +14,7 @@ gcc -Wl,-rpath,$HOME/local-gcc-trunk/lib64 \
     -lstdc++ -lpthread \
     -std=c++0x -fpic \
     -o $1.out \
-    -Wall -Wextra -Werror -pedantic -O3 -s \
-    -DNDEBUG \
+    -Wall -Wextra -Werror -pedantic -g -O0 \
     -fno-deduce-init-list \
     $1.cpp \
     $2
